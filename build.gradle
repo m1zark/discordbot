@@ -1,0 +1,114 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url = "https://files.minecraftforge.net/maven"
+        }
+        maven {
+            url = "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:3.+"
+        classpath "gradle.plugin.org.spongepowered:spongegradle:0.9.0"
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.4"
+    }
+}
+
+plugins {
+    id 'java'
+}
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: "org.spongepowered.plugin"
+
+version = modVersion
+group= modGroup
+archivesBaseName = modBaseName
+
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    runs {
+        server {
+            workingDirectory project.file('run')
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                dcintegration {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url = 'https://jitpack.io' }
+    ivy {
+        url "https://download.nodecdn.net/containers"
+        layout "pattern", {
+            artifact "/[organisation]/[module]/release/[revision]/[ext]"
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'org.spongepowered:spongeapi:7.2.0'
+    compile 'com.github.nucleuspowered:nucleus:1.8.2'
+    compile 'org.projectlombok:lombok:1.18.10'
+    compile 'com.github.rojo8399:PlaceholderAPI:master-SNAPSHOT'
+    shadow ('net.dv8tion:JDA:4.2.0_211') {
+        exclude module: 'opus-java'
+    }
+    shadow 'com.jagrosh:jda-utilities:2.1.5'
+    compile 'reforged:server:8.2.0@Pixelmon-1.12.2-8.2.0-server.jar'
+}
+
+configurations {
+    shadow
+    compile.extendsFrom shadow
+}
+
+reobf {
+    shadowJar {}
+}
+
+tasks.build.dependsOn shadowJar
+
+artifacts {
+    archives shadowJar
+}
+
+shadowJar {
+    relocate 'org.apache.commons.collections4', "shaded.org.apache.commons.collections4"
+    relocate 'javax.annotation', "shaded.javax"
+    relocate 'gnu.trove', "shaded.gnu.trove"
+    relocate 'com.fasterxml.jackson', 'shaded.com.fasterxml.jackson'
+    exclude "com/m1zark/pixelmoncommands/**", "com/m1zark/aurapokemon/**", "com/m1zark/pokehunt/**", "com/enjin/**", "com/m1zark/gts/**"
+    exclude "com/github/TSEcho/poketeams/**", "io/github/tsecho/poketeams/**", "de/randombyte/unity/**", "me/rojo8399/placeholderapi/**"
+    exclude "dummyThing"
+	exclude "module-info.class"
+
+    dependencies {
+        exclude(dependency('org.slf4j:slf4j-api'))
+        exclude(dependency('net.java.dev.jna:jna'))
+    }
+
+    project.configurations.shadow.setTransitive(true)
+    configurations = [project.configurations.shadow]
+    baseName = 'DiscordBot'
+    classifier null
+}
