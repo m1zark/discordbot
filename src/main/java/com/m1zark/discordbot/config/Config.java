@@ -66,7 +66,7 @@ public class Config {
             CommentedConfigurationNode notifications = main.getNode("notifications");
             CommentedConfigurationNode settings = main.getNode("settings");
             CommentedConfigurationNode messages = main.getNode("messages");
-            settings.getNode("bot", "token").getString("NDgxMTY5NTgxNzkzMjE0NDc0.Dl36AA.qDN9VtUjwrcVJ0ezkL2ulSnnPVE");
+            settings.getNode("bot", "token").getString("");
             settings.getNode("bot", "game-status").getString("with depression");
             settings.getNode("server-chat", "display-format").getString("{team}{topgroup}{prefix} {nick} : {message}");
             settings.getNode("server-chat", "enable").getBoolean(true);
